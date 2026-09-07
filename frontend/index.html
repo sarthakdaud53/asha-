@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital ASHA – Rural Child Health & Vaccination Management</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/custom.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            asha: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+
+  <!-- Navbar -->
+  <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-asha-600 flex items-center justify-center text-white text-xl font-bold shadow-md shadow-asha-600/30">
+          🏥
+        </div>
+        <div>
+          <span class="font-extrabold text-lg text-slate-900 tracking-tight flex items-center">
+            Digital ASHA
+            <span class="ml-2 px-2 py-0.5 text-[10px] font-bold bg-teal-100 text-teal-800 rounded-full">Rural UIP System</span>
+          </span>
+          <p class="text-xs text-slate-500 font-medium">Child Health & Immunization Platform</p>
+        </div>
+      </div>
+
+      <nav class="hidden md:flex items-center space-x-6 text-sm font-semibold text-slate-600">
+        <a href="#features" class="hover:text-asha-600 transition-colors">Key Features</a>
+        <a href="#panels" class="hover:text-asha-600 transition-colors">Portals & Roles</a>
+        <a href="#stats" class="hover:text-asha-600 transition-colors">UIP Schedule</a>
+      </nav>
+
+      <div class="flex items-center space-x-3">
+        <button onclick="openLoginModal()" class="px-4 py-2 rounded-xl text-sm font-bold text-asha-700 bg-asha-50 hover:bg-asha-100 transition-all border border-asha-200">
+          Log In
+        </button>
+        <button onclick="openRegisterModal()" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-asha-600 hover:bg-asha-700 shadow-md shadow-asha-600/20 transition-all">
+          Register Parent
+        </button>
+        <button onclick="openAshaApplicationModal()" class="inline-block px-4 py-2 rounded-xl text-sm font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 transition-all border border-teal-200">
+          Apply as ASHA
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="flex-1">
+    <section class="relative overflow-hidden pt-12 pb-20 bg-gradient-to-b from-teal-50/70 via-white to-slate-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          <div class="lg:col-span-7 space-y-6">
+            <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-teal-100/80 text-teal-900 text-xs font-bold">
+              <span>🌾 Empowering Rural Healthcare Workers</span>
+              <span>•</span>
+              <span>Universal Immunization Programme</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+              Transforming Rural Child Health, <br/>
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-sky-600">
+                Lightening ASHA Workers' Workload.
+              </span>
+            </h1>
+
+            <p class="text-base sm:text-lg text-slate-600 leading-relaxed">
+              No more repetitive door-to-door paper surveys or tedious manual registers. 
+              <strong>Digital ASHA</strong> empowers parents to self-register and manage their child's health records, while automatically calculating due and overdue vaccinations according to National UIP guidelines.
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-4 pt-2">
+              <button onclick="openLoginModal()" class="px-6 py-3.5 rounded-xl font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-lg shadow-teal-600/30 transition-all flex items-center space-x-2">
+                <span>Enter System Dashboard</span>
+                <span>→</span>
+              </button>
+            </div>
+
+            <!-- Problem / Solution Callout -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+              <div class="p-4 rounded-xl bg-rose-50/80 border border-rose-200 text-xs">
+                <div class="font-bold text-rose-900 flex items-center space-x-1.5 mb-1">
+                  <span>❌</span>
+                  <span>The Legacy Problem</span>
+                </div>
+                <p class="text-rose-700">Repeated household visits, lost paper cards, missed overdue booster doses, heavy physical register burden.</p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs">
+                <div class="font-bold text-emerald-900 flex items-center space-x-1.5 mb-1">
+                  <span>✅</span>
+                  <span>The Digital ASHA Solution</span>
+                </div>
+                <p class="text-emerald-700">Centralized database, parent self-entry, auto-generated due lists, WhatsApp reminders, and digital MCP card.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero Graphic Card -->
+          <div class="lg:col-span-5">
+            <div class="p-6 bg-white rounded-3xl border border-slate-200/80 shadow-2xl space-y-5">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold">
+                    👶
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-sm text-slate-900">National Immunization Tracking</h3>
+                    <p class="text-xs text-slate-500">Live Village Dynamic Calculator</p>
+                  </div>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">UIP 2026</span>
+              </div>
+
+              <!-- Quick Status Preview -->
+              <div class="space-y-3">
+                <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex justify-between items-center text-xs">
+                  <div>
+                    <span class="font-bold text-emerald-900">BCG & OPV-0 (Birth Doses)</span>
+                    <p class="text-emerald-700 text-[11px]">Given at PHC Rampur • Batch #2026-B101</p>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white">✓ Administered</span>
+                </div>
+
+                <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 flex justify-between items-center text-xs">
+                  <div>
+                    <span class="font-bold text-amber-900">Pentavalent-1 + Rota-1 + PCV-1</span>
+                    <p class="text-amber-700 text-[11px]">Target Age: 6 Weeks • Next Session: Wednesday</p>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">🔔 Due Now</span>
+                </div>
+
+                <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 flex justify-between items-center text-xs">
+                  <div>
+                    <span class="font-bold text-rose-900">MR-1 & Vitamin A (9-12 Months)</span>
+                    <p class="text-rose-700 text-[11px]">Flagged 18 Days Overdue • Follow-up Generated</p>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-600 text-white animate-pulse">⚠️ Overdue</span>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <span>📍 Coverage: Rampur & Belur Sub-Centers</span>
+                <span class="font-bold text-teal-700">100% Relational DB</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Key Features Section -->
+    <section id="features" class="py-16 bg-slate-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <span class="text-xs font-bold uppercase tracking-wider text-teal-600">Technical Highlights</span>
+          <h2 class="text-3xl font-extrabold text-slate-900 mt-1">Engineered for Reliability in the Field</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="p-6 bg-white rounded-2xl border border-slate-200 space-y-3">
+            <div class="text-2xl">📱</div>
+            <h3 class="font-bold text-base text-slate-900">Mobile-First Field Design</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Designed specifically with responsive touch targets and clean contrast so ASHA workers can use smartphones seamlessly during village Anganwadi sessions.
+            </p>
+          </div>
+
+          <div class="p-6 bg-white rounded-2xl border border-slate-200 space-y-3">
+            <div class="text-2xl">⚡</div>
+            <h3 class="font-bold text-base text-slate-900">Dynamic UIP Date Engine</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Upon child DOB entry, the system instantly computes exact due dates for all 27 UIP vaccine milestones, dynamically flagging upcoming, due, and overdue states.
+            </p>
+          </div>
+
+          <div class="p-6 bg-white rounded-2xl border border-slate-200 space-y-3">
+            <div class="text-2xl">🖨️</div>
+            <h3 class="font-bold text-base text-slate-900">Digital MCP Card & Export</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Parents and health workers can instantly view and print official Mother & Child Protection (MCP) cards and Village Immunization Registers with standard formatting.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Login Modal -->
+  <div id="login-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200 relative">
+      <button onclick="closeLoginModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+      <div class="mb-6">
+        <h3 class="text-2xl font-black text-slate-900">Account Login</h3>
+        <p class="text-xs text-slate-500 mt-1">Access Parent, ASHA, or Admin Portals</p>
+      </div>
+
+      <form id="login-form" class="space-y-4" onsubmit="handleLoginFormSubmit(event)">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Username or Mobile Number</label>
+          <input type="text" id="login-username" required class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm" placeholder="Username or mobile number">
+        </div>
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs font-bold text-slate-700 uppercase">Password</label>
+            <button type="button" onclick="openForgotPasswordModal()" class="text-xs text-teal-700 font-bold hover:underline">Forgot password?</button>
+          </div>
+          <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm" placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md shadow-teal-600/20 transition-all">
+          Sign In
+        </button>
+      </form>
+
+      <div class="mt-6 pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
+        New parent? <button onclick="switchToRegister()" class="text-teal-700 font-bold hover:underline">Register your child here</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="register-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeRegisterModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+      <div class="mb-6">
+        <h3 class="text-2xl font-black text-slate-900">Parent Registration</h3>
+        <p class="text-xs text-slate-500 mt-1">Register using mobile number and password to manage your family's health</p>
+      </div>
+
+      <form id="register-form" class="space-y-4" onsubmit="handleRegisterFormSubmit(event)">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Full Name *</label>
+            <input type="text" id="reg-fullname" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm" placeholder="e.g. Meena Devi">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Mobile Number (Login ID) *</label>
+            <input type="tel" id="reg-phone" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm" placeholder="10-digit mobile">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Choose Username *</label>
+            <input type="text" id="reg-username" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm" placeholder="e.g. meena_devi">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password *</label>
+            <input type="password" id="reg-password" required minlength="6" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm" placeholder="Min 6 characters">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">State / UT *</label>
+            <select id="reg-state-select" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">District *</label>
+            <select id="reg-district-select" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Taluka / Sub-district *</label>
+            <select id="reg-taluka-select" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Village *</label>
+            <select id="reg-village-select" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">House / Ward Address</label>
+          <input type="text" id="reg-address" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm" placeholder="e.g. House No. 24, Near Temple">
+        </div>
+
+        <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md shadow-teal-600/20 transition-all mt-2">
+          Create Parent Account
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="asha-application-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeAshaApplicationModal()" class="absolute top-5 right-5 text-slate-400 font-bold text-xl">✕</button>
+      <h3 class="text-2xl font-black text-slate-900">Apply as an ASHA Worker</h3>
+      <p class="text-xs text-slate-500 mt-1 mb-5">Create your ASHA account using a secure password and assigned village.</p>
+      <form id="asha-application-form" class="space-y-3" onsubmit="handleAshaApplicationSubmit(event)">
+        <input id="apply-asha-name" required minlength="2" placeholder="Full name *" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input id="apply-asha-phone" required minlength="10" placeholder="Mobile number *" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm">
+          <input id="apply-asha-username" required minlength="3" placeholder="Preferred username *" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm">
+        </div>
+        <input id="apply-asha-email" type="email" placeholder="Email (optional)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm">
+        <input id="apply-asha-password" type="password" required minlength="6" placeholder="Password (minimum 6 characters) *" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <select id="apply-asha-state" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"></select>
+          <select id="apply-asha-district" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"></select>
+          <select id="apply-asha-taluka" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"></select>
+          <select id="apply-asha-village" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"></select>
+        </div>
+        <input id="apply-asha-qualification" placeholder="Qualification" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm">
+        <input id="apply-asha-experience" type="number" min="0" max="60" value="0" placeholder="Years of experience" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm">
+        <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700">Submit ASHA Application</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgot-password-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200 relative">
+      <button onclick="closeForgotPasswordModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+      
+      <div class="mb-5">
+        <h3 class="text-2xl font-black text-slate-900">Reset Password</h3>
+        <p class="text-xs text-slate-500 mt-1">Enter your registered username or mobile number to recover access</p>
+      </div>
+
+      <div id="forgot-step-1" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Username or Mobile Number</label>
+          <input type="text" id="forgot-identifier" required placeholder="Username or mobile number" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm">
+        </div>
+        <button onclick="submitForgotPassword()" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md">
+          Request Password Reset
+        </button>
+      </div>
+
+      <div id="forgot-step-2" class="hidden space-y-4 pt-2">
+        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
+          ✓ Reset token verified. Enter your new password below:
+        </div>
+        <input type="hidden" id="reset-token-holder">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">New Password</label>
+          <input type="password" id="reset-new-password" required minlength="6" placeholder="Min 6 characters" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm">
+        </div>
+        <button onclick="submitResetPassword()" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-700 shadow-md">
+          Set New Password & Login
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-8 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <p class="font-bold text-white text-sm">Digital ASHA – Rural Child Health & Vaccination Management</p>
+        <p class="text-slate-500 mt-0.5">Production-Quality College Project for Rural Community Engagement</p>
+      </div>
+      <p>© 2026 Digital ASHA Platform • Universal Immunization Programme</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/js/utils.js?v=20260908"></script>
+  <script src="/js/api.js?v=20260908"></script>
+  <script src="/js/auth.js?v=20260908"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('session_expired')) {
+        Utils.showToast('Your session has expired. Please log in again.', 'warning');
+      }
+
+      setupLocationCascade();
+    });
+
+    async function setupLocationCascade() {
+      const state = document.getElementById('reg-state-select');
+      const district = document.getElementById('reg-district-select');
+      const taluka = document.getElementById('reg-taluka-select');
+      const village = document.getElementById('reg-village-select');
+      const fill = (el, placeholder, rows) => {
+        el.innerHTML = `<option value="">${placeholder}</option>` + rows.map(row => `<option value="${row.id}">${Utils.escapeHtml(row.name)}</option>`).join('');
+        el.disabled = rows.length === 0;
+      };
+      fill(state, '-- Choose state / UT --', await API.getLocationStates());
+      state.addEventListener('change', async () => {
+        fill(district, '-- Choose district --', state.value ? await API.getLocationDistricts(state.value) : []);
+        fill(taluka, '-- Choose taluka / sub-district --', []);
+        fill(village, '-- Choose village --', []);
+      });
+      district.addEventListener('change', async () => {
+        fill(taluka, '-- Choose taluka / sub-district --', district.value ? await API.getLocationTalukas(district.value) : []);
+        fill(village, '-- Choose village --', []);
+      });
+      taluka.addEventListener('change', async () => {
+        fill(village, '-- Choose village --', taluka.value ? await API.getLocationVillages(taluka.value) : []);
+      });
+    }
+
+    function openLoginModal() {
+      document.getElementById('login-modal').classList.remove('hidden');
+    }
+    function closeLoginModal() {
+      document.getElementById('login-modal').classList.add('hidden');
+    }
+    function openRegisterModal() {
+      document.getElementById('register-modal').classList.remove('hidden');
+    }
+    async function openAshaApplicationModal() {
+      document.getElementById('asha-application-modal').classList.remove('hidden');
+      const state = document.getElementById('apply-asha-state');
+      if (state.dataset.ready) return;
+      state.dataset.ready = '1';
+      const district = document.getElementById('apply-asha-district');
+      const taluka = document.getElementById('apply-asha-taluka');
+      const village = document.getElementById('apply-asha-village');
+      const fill = (el, placeholder, rows) => {
+        el.innerHTML = `<option value="">${placeholder}</option>` + rows.map(row => `<option value="${row.id}">${Utils.escapeHtml(row.name)}</option>`).join('');
+        el.disabled = rows.length === 0;
+      };
+      fill(state, '-- Choose state / UT --', await API.getLocationStates());
+      state.onchange = async () => { fill(district, '-- Choose district --', state.value ? await API.getLocationDistricts(state.value) : []); fill(taluka, '-- Choose taluka --', []); fill(village, '-- Choose village --', []); };
+      district.onchange = async () => { fill(taluka, '-- Choose taluka --', district.value ? await API.getLocationTalukas(district.value) : []); fill(village, '-- Choose village --', []); };
+      taluka.onchange = async () => { fill(village, '-- Choose village --', taluka.value ? await API.getLocationVillages(taluka.value) : []); };
+    }
+    function closeAshaApplicationModal() { document.getElementById('asha-application-modal').classList.add('hidden'); }
+    async function handleAshaApplicationSubmit(event) {
+      event.preventDefault();
+      const payload = {
+        full_name: document.getElementById('apply-asha-name').value,
+        phone: document.getElementById('apply-asha-phone').value,
+        username: document.getElementById('apply-asha-username').value,
+        email: document.getElementById('apply-asha-email').value || null,
+        location_state_id: parseInt(document.getElementById('apply-asha-state').value),
+        location_district_id: parseInt(document.getElementById('apply-asha-district').value),
+        location_taluka_id: parseInt(document.getElementById('apply-asha-taluka').value),
+        location_village_id: parseInt(document.getElementById('apply-asha-village').value),
+        qualification: document.getElementById('apply-asha-qualification').value || null,
+        experience_years: parseInt(document.getElementById('apply-asha-experience').value) || 0
+        , password: document.getElementById('apply-asha-password').value
+      };
+      try {
+        await API.submitAshaApplication(payload);
+        closeAshaApplicationModal();
+        document.getElementById('asha-application-form').reset();
+        Utils.showToast('ASHA account created. You can now log in.', 'success');
+      } catch (err) {
+        Utils.showToast(err.message, 'error');
+      }
+    }
+    function closeRegisterModal() {
+      document.getElementById('register-modal').classList.add('hidden');
+    }
+    function switchToRegister() {
+      closeLoginModal();
+      openRegisterModal();
+    }
+    function openForgotPasswordModal() {
+      closeLoginModal();
+      document.getElementById('forgot-password-modal').classList.remove('hidden');
+      document.getElementById('forgot-step-1').classList.remove('hidden');
+      document.getElementById('forgot-step-2').classList.add('hidden');
+    }
+    function closeForgotPasswordModal() {
+      document.getElementById('forgot-password-modal').classList.add('hidden');
+    }
+
+    async function handleLoginFormSubmit(e) {
+      e.preventDefault();
+      const u = document.getElementById('login-username').value;
+      const p = document.getElementById('login-password').value;
+      await Auth.handleLogin(u, p);
+    }
+
+    async function handleRegisterFormSubmit(e) {
+      e.preventDefault();
+      const payload = {
+        full_name: document.getElementById('reg-fullname').value,
+        phone: document.getElementById('reg-phone').value,
+        username: document.getElementById('reg-username').value,
+        password: document.getElementById('reg-password').value,
+        location_state_id: parseInt(document.getElementById('reg-state-select').value),
+        location_district_id: parseInt(document.getElementById('reg-district-select').value),
+        location_taluka_id: parseInt(document.getElementById('reg-taluka-select').value),
+        location_village_id: parseInt(document.getElementById('reg-village-select').value),
+        address: document.getElementById('reg-address').value || null
+      };
+
+      try {
+        await API.register(payload);
+        Utils.showToast('Parent account registered! Automatically logging you in...', 'success');
+        closeRegisterModal();
+        await Auth.handleLogin(payload.username, payload.password);
+      } catch (err) {
+        Utils.showToast(err.message, 'error');
+      }
+    }
+
+    async function submitForgotPassword() {
+      const id = document.getElementById('forgot-identifier').value;
+      if (!id) {
+        Utils.showToast('Please enter your username or phone number', 'warning');
+        return;
+      }
+      try {
+        const token = await Auth.handleForgotPassword(id);
+        if (token) {
+          document.getElementById('reset-token-holder').value = token;
+          document.getElementById('forgot-step-1').classList.add('hidden');
+          document.getElementById('forgot-step-2').classList.remove('hidden');
+        }
+      } catch (err) {
+        // handled in helper
+      }
+    }
+
+    async function submitResetPassword() {
+      const token = document.getElementById('reset-token-holder').value;
+      const newP = document.getElementById('reset-new-password').value;
+      if (!newP || newP.length < 6) {
+        Utils.showToast('New password must be at least 6 characters', 'warning');
+        return;
+      }
+      try {
+        await Auth.handleResetPassword(token, newP);
+        closeForgotPasswordModal();
+        openLoginModal();
+      } catch (err) {
+        // handled in helper
+      }
+    }
+  </script>
+</body>
+</html>

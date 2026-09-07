@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Administration & Analytics – Digital ASHA</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+
+  <!-- Admin Navbar -->
+  <header id="admin-profile" class="bg-slate-900 text-white sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="/index.html" class="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center text-xl font-bold shadow-inner">
+          🏛️
+        </a>
+        <div>
+          <span class="font-extrabold text-base sm:text-lg tracking-tight flex items-center">
+            Health Officer Administrative Portal
+            <span class="ml-2 px-2 py-0.5 text-[10px] font-bold bg-sky-800 text-sky-200 rounded-full">District Level</span>
+          </span>
+          <p class="text-xs text-slate-400 font-medium hidden sm:block">Primary Health Centre & Sub-Center Administration</p>
+        </div>
+      </div>
+
+      <!-- User Info & Logout -->
+      <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
+          <div id="nav-user-avatar" class="w-7 h-7 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center text-xs">D</div>
+          <div class="text-left hidden sm:block">
+            <span id="nav-user-name" class="text-xs font-bold text-white block leading-tight">Dr. Rajesh Sharma</span>
+            <span id="nav-user-role" class="text-[10px] text-sky-400 font-medium block leading-tight">Block Medical Officer</span>
+          </div>
+        </div>
+
+        <button onclick="Auth.logout()" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors" title="Log Out">
+          🚪 <span class="text-xs font-bold hidden md:inline ml-1">Log Out</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <nav aria-label="Admin panel navigation" class="bg-white border-b border-slate-200 sticky top-16 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-2 overflow-x-auto py-2">
+      <a href="#admin-dashboard" class="px-3 py-2 rounded-lg text-xs font-bold text-sky-700 hover:bg-sky-50 whitespace-nowrap">Dashboard</a>
+      <a href="#admin-users" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 whitespace-nowrap">User Management</a>
+      <a href="#admin-parents" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 whitespace-nowrap">Parent Directory</a>
+      <a href="#admin-locations" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 whitespace-nowrap">ASHA Workers</a>
+      <a href="#admin-locations" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 whitespace-nowrap">Locations</a>
+      <a href="#admin-children" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 whitespace-nowrap">Children</a>
+      <a href="#admin-vaccinations" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 whitespace-nowrap">Vaccinations</a>
+      <a href="#admin-reports" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 whitespace-nowrap">Reports</a>
+      <a href="#admin-audit" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 whitespace-nowrap">Audit Logs</a>
+      <a href="#admin-profile" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 whitespace-nowrap">Profile</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- KPI Overview Cards -->
+    <div id="admin-dashboard" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      
+      <div class="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm text-center">
+        <span class="text-xs font-bold text-slate-500 uppercase block">Villages</span>
+        <span id="stat-total-villages" class="text-3xl font-black text-slate-800 mt-1 block">0</span>
+      </div>
+
+      <div class="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm text-center">
+        <span class="text-xs font-bold text-slate-500 uppercase block">ASHA Workers</span>
+        <span id="stat-total-ashas" class="text-3xl font-black text-sky-700 mt-1 block">0</span>
+      </div>
+
+      <div class="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm text-center">
+        <span class="text-xs font-bold text-slate-500 uppercase block">Registered Children</span>
+        <span id="stat-total-children" class="text-3xl font-black text-slate-800 mt-1 block">0</span>
+      </div>
+
+      <div class="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm text-center">
+        <span class="text-xs font-bold text-slate-500 uppercase block">Doses Given</span>
+        <span id="stat-total-administered" class="text-3xl font-black text-emerald-700 mt-1 block">0</span>
+      </div>
+
+      <div class="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm text-center">
+        <span class="text-xs font-bold text-slate-500 uppercase block">Overdue Cases</span>
+        <span id="stat-total-overdue" class="text-3xl font-black text-rose-700 mt-1 block">0</span>
+      </div>
+
+      <div class="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm text-center">
+        <span class="text-xs font-bold text-slate-500 uppercase block">Overall Rate</span>
+        <span id="stat-overall-rate" class="text-3xl font-black text-teal-700 mt-1 block">0%</span>
+      </div>
+
+    </div>
+
+    <!-- Section 1: Village Coverage & Jurisdictions -->
+    <div id="admin-locations" class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <span>🌾</span>
+            <span>Village Immunization Coverage & ASHA Allocations</span>
+          </h3>
+          <p class="text-xs text-slate-500">Live monitoring of coverage rate across Sub-Centers</p>
+        </div>
+
+        <div class="flex space-x-2">
+          <button onclick="openProvisionAshaModal()" class="px-4 py-2.5 rounded-xl font-bold text-xs bg-teal-600 hover:bg-teal-700 text-white shadow-md transition-all flex items-center space-x-1.5">
+            <span>👩‍⚕️</span>
+            <span>Provision ASHA Worker</span>
+          </button>
+          <button onclick="openCreateVillageModal()" class="px-4 py-2.5 rounded-xl font-bold text-xs bg-sky-700 hover:bg-sky-800 text-white shadow-md transition-all flex items-center space-x-1.5">
+            <span>➕</span>
+            <span>Add New Village</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="data-table w-full text-left border-collapse">
+          <thead>
+            <tr class="text-slate-400 text-xs font-semibold border-b border-slate-200 bg-slate-50/60">
+              <th class="py-3 px-4">Village Name</th>
+              <th class="py-3 px-4">Sub-Center</th>
+              <th class="py-3 px-4">PHC Center</th>
+              <th class="py-3 px-4">District / State</th>
+              <th class="py-3 px-4">Assigned ASHA</th>
+              <th class="py-3 px-4">Total Children</th>
+              <th class="py-3 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-villages-tbody">
+            <!-- Injected via admin.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 2: UIP Master Vaccine Schedule Catalog -->
+    <div id="admin-vaccinations" class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <span>💉</span>
+            <span>National Universal Immunization Programme (UIP) Master Schedule</span>
+          </h3>
+          <p class="text-xs text-slate-500">Stored centrally in database • Manageable by Health Administrator</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="data-table w-full text-left border-collapse">
+          <thead>
+            <tr class="text-slate-400 text-xs font-semibold border-b border-slate-200 bg-slate-50/60">
+              <th class="py-3 px-4">Code</th>
+              <th class="py-3 px-4">Vaccine Name</th>
+              <th class="py-3 px-4">Age Category</th>
+              <th class="py-3 px-4">Target Timing</th>
+              <th class="py-3 px-4">Dose & Route</th>
+              <th class="py-3 px-4">Diseases Prevented</th>
+            </tr>
+          </thead>
+          <tbody id="admin-vaccines-tbody">
+            <!-- Injected via admin.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 3: User Management -->
+    <div id="admin-users" class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <span>👤</span>
+            <span>User Management</span>
+          </h3>
+          <p class="text-xs text-slate-500">All registered accounts across Parent, ASHA & Admin roles</p>
+        </div>
+        <select id="users-role-filter" onchange="loadUsersTable()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white">
+          <option value="">All Roles</option>
+          <option value="parent">Parent</option>
+          <option value="asha">ASHA Worker</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="data-table w-full text-left border-collapse">
+          <thead>
+            <tr class="text-slate-400 text-xs font-semibold border-b border-slate-200 bg-slate-50/60">
+              <th class="py-3 px-4">Name</th>
+              <th class="py-3 px-4">Username / Phone</th>
+              <th class="py-3 px-4">Role</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-users-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 4: Parents Directory -->
+    <div id="admin-parents" class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+      <div class="border-b border-slate-100 pb-4">
+        <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+          <span>👪</span>
+          <span>Parent Directory</span>
+        </h3>
+        <p class="text-xs text-slate-500">Registered parents and their family/child counts</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="data-table w-full text-left border-collapse">
+          <thead>
+            <tr class="text-slate-400 text-xs font-semibold border-b border-slate-200 bg-slate-50/60">
+              <th class="py-3 px-4">Name</th>
+              <th class="py-3 px-4">Phone</th>
+              <th class="py-3 px-4">Occupation</th>
+              <th class="py-3 px-4">Families</th>
+              <th class="py-3 px-4">Children</th>
+            </tr>
+          </thead>
+          <tbody id="admin-parents-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 5: Children Directory -->
+    <div id="admin-children" class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <span>🧒</span>
+            <span>Children Directory (All Villages)</span>
+          </h3>
+          <p class="text-xs text-slate-500">District-wide registered child roster</p>
+        </div>
+        <select id="children-verification-filter" onchange="loadChildrenDirectory()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white">
+          <option value="">All Statuses</option>
+          <option value="verified">Verified</option>
+          <option value="pending">Pending Verification</option>
+        </select>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="data-table w-full text-left border-collapse">
+          <thead>
+            <tr class="text-slate-400 text-xs font-semibold border-b border-slate-200 bg-slate-50/60">
+              <th class="py-3 px-4">Name</th>
+              <th class="py-3 px-4">Village</th>
+              <th class="py-3 px-4">Parent</th>
+              <th class="py-3 px-4">Verification</th>
+              <th class="py-3 px-4">Immunization</th>
+            </tr>
+          </thead>
+          <tbody id="admin-children-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 6: Vaccination Records -->
+    <div id="admin-vaccination-records" class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <span>💉</span>
+            <span>Vaccination Records Browser</span>
+          </h3>
+          <p class="text-xs text-slate-500">All dose records across the district</p>
+        </div>
+        <select id="vaccination-status-filter" onchange="loadVaccinationRecords()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white">
+          <option value="">All</option>
+          <option value="administered">Administered</option>
+          <option value="pending">Pending</option>
+          <option value="overdue">Overdue</option>
+        </select>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="data-table w-full text-left border-collapse">
+          <thead>
+            <tr class="text-slate-400 text-xs font-semibold border-b border-slate-200 bg-slate-50/60">
+              <th class="py-3 px-4">Child</th>
+              <th class="py-3 px-4">Village</th>
+              <th class="py-3 px-4">Vaccine</th>
+              <th class="py-3 px-4">Scheduled</th>
+              <th class="py-3 px-4">Administered</th>
+              <th class="py-3 px-4">By</th>
+            </tr>
+          </thead>
+          <tbody id="admin-vaccination-records-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 7: District Reports -->
+    <div id="admin-reports" class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+      <div class="border-b border-slate-100 pb-4">
+        <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+          <span>📊</span>
+          <span>District Immunization Report</span>
+        </h3>
+        <p class="text-xs text-slate-500" id="report-generated-on">Aggregated coverage summary</p>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="report-summary-cards"></div>
+      <div class="overflow-x-auto">
+        <table class="data-table w-full text-left border-collapse">
+          <thead>
+            <tr class="text-slate-400 text-xs font-semibold border-b border-slate-200 bg-slate-50/60">
+              <th class="py-3 px-4">Village</th>
+              <th class="py-3 px-4">Total</th>
+              <th class="py-3 px-4">Fully Immunized</th>
+              <th class="py-3 px-4">Partial</th>
+              <th class="py-3 px-4">Overdue</th>
+              <th class="py-3 px-4">Coverage</th>
+            </tr>
+          </thead>
+          <tbody id="admin-report-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 8: Audit Logs -->
+    <div id="admin-audit" class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+      <div class="border-b border-slate-100 pb-4">
+        <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+          <span>📜</span>
+          <span>System Audit Trail</span>
+        </h3>
+        <p class="text-xs text-slate-500">Most recent 50 system actions</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="data-table w-full text-left border-collapse">
+          <thead>
+            <tr class="text-slate-400 text-xs font-semibold border-b border-slate-200 bg-slate-50/60">
+              <th class="py-3 px-4">Time</th>
+              <th class="py-3 px-4">User</th>
+              <th class="py-3 px-4">Action</th>
+              <th class="py-3 px-4">Entity</th>
+              <th class="py-3 px-4">Details</th>
+            </tr>
+          </thead>
+          <tbody id="admin-audit-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal: Send Notification -->
+  <div id="send-notification-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeSendNotificationModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+
+      <div class="mb-5">
+        <span class="text-xs font-bold uppercase tracking-wider text-violet-700">Notification Center</span>
+        <h3 class="text-2xl font-black text-slate-900 mt-0.5">Send Notification</h3>
+        <p class="text-xs text-slate-500 mt-1">To: <span id="notify-recipient-name" class="font-bold text-slate-700"></span></p>
+      </div>
+
+      <form id="send-notification-form" class="space-y-4" onsubmit="handleSendNotificationSubmit(event)">
+        <input type="hidden" id="notify-user-id">
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Title *</label>
+          <input type="text" id="notify-title" required maxlength="200" placeholder="e.g. Verification pending" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-violet-500 text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Message *</label>
+          <textarea id="notify-message" required rows="3" placeholder="Message body" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-violet-500 text-sm"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Priority</label>
+            <select id="notify-priority" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-violet-500 text-sm">
+              <option value="LOW">Low</option>
+              <option value="MEDIUM" selected>Medium</option>
+              <option value="HIGH">High</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Type</label>
+            <select id="notify-type" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-violet-500 text-sm">
+              <option value="general" selected>General</option>
+              <option value="asha_followup">Follow-up</option>
+              <option value="verification_required">Verification</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl text-sm transition">
+          Send Notification
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Provision ASHA Worker -->
+  <div id="provision-asha-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeProvisionAshaModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+      
+      <div class="mb-5">
+        <span class="text-xs font-bold uppercase tracking-wider text-teal-700">Staff Accreditation</span>
+        <h3 class="text-2xl font-black text-slate-900 mt-0.5">Provision ASHA Worker</h3>
+        <p class="text-xs text-slate-500 mt-1">Admin provisioning of village health activist account</p>
+      </div>
+
+      <form id="provision-asha-form" class="space-y-4" onsubmit="handleProvisionAshaSubmit(event)">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Full Name *</label>
+          <input type="text" id="new-asha-name" required placeholder="e.g. Geeta Devi (ASHA)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Mobile (Login ID) *</label>
+            <input type="tel" id="new-asha-phone" required placeholder="10-digit mobile" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Username *</label>
+            <input type="text" id="new-asha-username" required placeholder="e.g. asha_geeta" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Temporary Password *</label>
+          <input type="password" id="new-asha-password" required minlength="6" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <select id="new-asha-state" aria-label="State / UT" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+          <select id="new-asha-district" aria-label="District" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+          <select id="new-asha-taluka" aria-label="Taluka / Sub-district" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+          <select id="new-asha-location-village" aria-label="Village" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+        </div>
+        <p class="text-xs text-slate-500">The selected real village must already be registered as an operational village before an ASHA account can be assigned.</p>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Qualification</label>
+            <input type="text" id="new-asha-qual" value="Higher Secondary (12th Pass)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Years Experience</label>
+            <input type="number" id="new-asha-exp" value="2" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md">
+          Create ASHA Worker Account
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Create Village -->
+  <div id="create-village-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+      <button onclick="closeCreateVillageModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+      
+      <div class="mb-5">
+        <span class="text-xs font-bold uppercase tracking-wider text-sky-700">Territory Setup</span>
+        <h3 class="text-2xl font-black text-slate-900 mt-0.5">Register New Village</h3>
+      </div>
+
+      <form id="create-village-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Village Name *</label>
+          <input type="text" id="new-village-name" required placeholder="e.g. Anandpur" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 text-sm">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <select id="new-village-state" aria-label="State / UT" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+          <select id="new-village-district-select" aria-label="District" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+          <select id="new-village-taluka" aria-label="Taluka / Sub-district" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+          <select id="new-village-location" aria-label="Village from LGD" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"></select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Health Sub-Center *</label>
+          <input type="text" id="new-village-subcenter" required placeholder="e.g. Anandpur Sub-Center" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Primary Health Centre (PHC) *</label>
+          <input type="text" id="new-village-phc" required value="Rampur Primary Health Centre" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 text-sm">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">District *</label>
+            <input type="text" id="new-village-district" required value="Sehore" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Pincode</label>
+            <input type="text" id="new-village-pincode" placeholder="466001" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 text-sm">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-sky-700 hover:bg-sky-800 shadow-md">
+          Save Village
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Assign ASHA Worker -->
+  <div id="assign-asha-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+      <button onclick="closeAssignAshaModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+      
+      <div class="mb-5">
+        <span class="text-xs font-bold uppercase tracking-wider text-sky-700">Staff Allocation</span>
+        <h3 class="text-2xl font-black text-slate-900 mt-0.5">Assign ASHA Worker</h3>
+        <p class="text-xs text-slate-500 mt-1">Village: <strong id="assign-village-name" class="text-slate-800">Village</strong></p>
+      </div>
+
+      <form id="assign-asha-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Select ASHA Worker *</label>
+          <select id="assign-asha-select" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 text-sm bg-white">
+            <option value="">-- Choose ASHA Worker --</option>
+          </select>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-sky-700 hover:bg-sky-800 shadow-md">
+          Confirm Assignment
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/utils.js?v=20260908"></script>
+  <script src="/js/api.js?v=20260908"></script>
+  <script src="/js/auth.js?v=20260908"></script>
+  <script src="/js/admin.js?v=20260908"></script>
+  <script>
+    function openSendNotificationModal(userId, recipientName) {
+      document.getElementById('notify-user-id').value = userId;
+      document.getElementById('notify-recipient-name').textContent = recipientName;
+      document.getElementById('send-notification-modal').classList.remove('hidden');
+    }
+    function closeSendNotificationModal() {
+      document.getElementById('send-notification-modal').classList.add('hidden');
+      document.getElementById('send-notification-form').reset();
+    }
+
+    async function handleSendNotificationSubmit(e) {
+      e.preventDefault();
+      const payload = {
+        user_id: parseInt(document.getElementById('notify-user-id').value),
+        title: document.getElementById('notify-title').value,
+        message: document.getElementById('notify-message').value,
+        priority: document.getElementById('notify-priority').value,
+        notification_type: document.getElementById('notify-type').value,
+        channel: 'in_app'
+      };
+
+      try {
+        await API.sendCustomNotification(payload);
+        Utils.showToast(`Notification sent to ${document.getElementById('notify-recipient-name').textContent}.`, 'success');
+        closeSendNotificationModal();
+      } catch (err) {
+        Utils.showToast(err.message, 'error');
+      }
+    }
+
+    function openProvisionAshaModal() {
+      document.getElementById('provision-asha-modal').classList.remove('hidden');
+      setupAshaLocationCascade();
+    }
+    function closeProvisionAshaModal() {
+      document.getElementById('provision-asha-modal').classList.add('hidden');
+    }
+
+    async function handleProvisionAshaSubmit(e) {
+      e.preventDefault();
+      const payload = {
+        full_name: document.getElementById('new-asha-name').value,
+        phone: document.getElementById('new-asha-phone').value,
+        username: document.getElementById('new-asha-username').value,
+        password: document.getElementById('new-asha-password').value,
+        location_state_id: parseInt(document.getElementById('new-asha-state').value),
+        location_district_id: parseInt(document.getElementById('new-asha-district').value),
+        location_taluka_id: parseInt(document.getElementById('new-asha-taluka').value),
+        location_village_id: parseInt(document.getElementById('new-asha-location-village').value),
+        qualification: document.getElementById('new-asha-qual').value,
+        experience_years: parseInt(document.getElementById('new-asha-exp').value) || 1
+      };
+
+      try {
+        const res = await API.request('/admin/asha-workers', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        Utils.showToast(`Provisioned ASHA Worker ${res.full_name} (${res.worker_code})!`, 'success');
+        closeProvisionAshaModal();
+        document.getElementById('provision-asha-form').reset();
+        await loadAdminDashboard();
+        await loadVillagesTable();
+        await loadAshaWorkersList();
+      } catch (err) {
+        Utils.showToast(err.message, 'error');
+      }
+    }
+
+    async function setupAshaLocationCascade() {
+      const state = document.getElementById('new-asha-state');
+      const district = document.getElementById('new-asha-district');
+      const taluka = document.getElementById('new-asha-taluka');
+      const village = document.getElementById('new-asha-location-village');
+      if (!state || state.dataset.ready) return;
+      state.dataset.ready = '1';
+      const fill = (el, placeholder, rows) => {
+        el.innerHTML = `<option value="">${placeholder}</option>` +
+          rows.map(row => `<option value="${row.id}">${Utils.escapeHtml(row.name)}</option>`).join('');
+        el.disabled = rows.length === 0;
+      };
+      fill(state, '-- Choose state / UT --', await API.getLocationStates());
+      state.addEventListener('change', async () => {
+        fill(district, '-- Choose district --', state.value ? await API.getLocationDistricts(state.value) : []);
+        fill(taluka, '-- Choose taluka / sub-district --', []);
+        fill(village, '-- Choose village --', []);
+      });
+      district.addEventListener('change', async () => {
+        fill(taluka, '-- Choose taluka / sub-district --', district.value ? await API.getLocationTalukas(district.value) : []);
+        fill(village, '-- Choose village --', []);
+      });
+      taluka.addEventListener('change', async () => {
+        fill(village, '-- Choose village --', taluka.value ? await API.getLocationVillages(taluka.value) : []);
+      });
+    }
+  </script>
+</body>
+</html>

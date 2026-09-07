@@ -1,0 +1,228 @@
+/* Digital ASHA - Custom Healthcare Design Styles */
+
+:root {
+  --primary: #0d9488; /* Teal 600 */
+  --primary-dark: #0f766e;
+  --primary-light: #ccfbf1;
+  --secondary: #0284c7; /* Sky 600 */
+  --accent: #f59e0b; /* Amber 500 */
+  --danger: #ef4444; /* Red 500 */
+  --success: #10b981; /* Emerald 500 */
+  --surface: #ffffff;
+  --background: #f8fafc;
+  --focus-ring: #0d9488;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--background);
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--focus-ring) 35%, transparent);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;
+}
+
+.data-table {
+  min-width: 720px;
+}
+
+.data-table th {
+  white-space: nowrap;
+}
+
+.page-section {
+  scroll-margin-top: 5rem;
+}
+
+.status-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.status-label::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* Glassmorphism Card */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* Badge Styles */
+.badge-administered {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-due {
+  background-color: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.badge-overdue {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.badge-upcoming {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.badge-sam {
+  background-color: #ef4444;
+  color: #ffffff;
+  animation: pulse-danger 2s infinite;
+}
+
+.badge-mam {
+  background-color: #f59e0b;
+  color: #ffffff;
+}
+
+.badge-normal {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+@keyframes pulse-danger {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(0.98); }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Timeline Components */
+.timeline-dot {
+  position: relative;
+  z-index: 10;
+}
+.timeline-line {
+  position: absolute;
+  top: 24px;
+  bottom: 0;
+  left: 20px;
+  width: 2px;
+  background-color: #e2e8f0;
+  z-index: 0;
+}
+
+/* MCP Card Print Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #mcp-card-printable, #mcp-card-printable * {
+    visibility: visible;
+  }
+  #mcp-card-printable {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Smooth modal transitions */
+.modal-backdrop {
+  transition: opacity 0.2s ease-in-out;
+}
+.modal-content {
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Toast Container */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  #toast-container {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  #toast-container > * {
+    width: 100%;
+  }
+
+  .data-table {
+    min-width: 640px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

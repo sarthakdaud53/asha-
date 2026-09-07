@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASHA Worker Field Hub – Digital ASHA</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/custom.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            asha: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .nav-tab.active { @apply bg-teal-800 text-white font-bold shadow-sm; }
+    .nav-tab:not(.active) { @apply text-teal-200 hover:bg-teal-800/60 hover:text-white; }
+    .section-view { display: none; }
+    .section-view.active { display: block; }
+    .priority-high { @apply bg-rose-50 border-rose-200 text-rose-800; }
+    .priority-med { @apply bg-amber-50 border-amber-200 text-amber-800; }
+    .priority-low { @apply bg-sky-50 border-sky-200 text-sky-800; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+
+  <!-- ASHA Header -->
+  <header class="bg-teal-900 text-white sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center text-xl font-bold shadow-inner">
+          👩‍⚕️
+        </div>
+        <div>
+          <span class="font-extrabold text-base sm:text-lg tracking-tight flex items-center">
+            Digital ASHA <span class="ml-2 px-2 py-0.5 text-[10px] font-bold bg-teal-700 text-teal-100 rounded-full">Field Operations Hub</span>
+          </span>
+          <p class="text-xs text-teal-200/80 font-medium hidden sm:block">Actionable Rural Child Health & Immunization Management</p>
+        </div>
+      </div>
+
+      <!-- User Info & Actions -->
+      <div class="flex items-center space-x-3">
+        <button onclick="switchAshaSection('notifications')" class="relative p-2 rounded-xl text-teal-200 hover:bg-teal-800 hover:text-white">
+          🔔
+          <span id="notif-badge-asha" class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+
+        <div onclick="switchAshaSection('profile')" class="flex items-center space-x-2 bg-teal-800/80 px-3 py-1.5 rounded-xl border border-teal-700 cursor-pointer hover:bg-teal-800">
+          <div id="asha-avatar" class="w-7 h-7 rounded-lg bg-teal-600 text-white font-bold flex items-center justify-center text-xs">A</div>
+          <div class="text-left hidden sm:block">
+            <span id="asha-name" class="text-xs font-bold text-white block leading-tight">Sunita Devi (ASHA)</span>
+            <span id="asha-role" class="text-[10px] text-teal-300 font-medium block leading-tight">Rampur Village</span>
+          </div>
+        </div>
+
+        <button onclick="Auth.logout()" class="p-2 rounded-xl text-teal-200 hover:text-white hover:bg-teal-800 transition-colors" title="Log Out">
+          🚪 <span class="text-xs font-bold hidden md:inline ml-1">Log Out</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="bg-teal-950 border-t border-teal-800/50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto scrollbar-hide py-1 space-x-1">
+        <button onclick="switchAshaSection('dashboard')" id="nav-dashboard" class="nav-tab active px-3.5 py-2 rounded-xl text-xs whitespace-nowrap">
+          🏠 Dashboard
+        </button>
+        <button onclick="switchAshaSection('priority-followups')" id="nav-priority-followups" class="nav-tab px-3.5 py-2 rounded-xl text-xs whitespace-nowrap">
+          ⚡ Priority Follow-ups
+        </button>
+        <button onclick="switchAshaSection('children')" id="nav-children" class="nav-tab px-3.5 py-2 rounded-xl text-xs whitespace-nowrap">
+          👶 Children
+        </button>
+        <button onclick="switchAshaSection('families')" id="nav-families" class="nav-tab px-3.5 py-2 rounded-xl text-xs whitespace-nowrap">
+          👨‍👩‍👧 Families
+        </button>
+        <button onclick="switchAshaSection('vaccinations')" id="nav-vaccinations" class="nav-tab px-3.5 py-2 rounded-xl text-xs whitespace-nowrap">
+          💉 Vaccinations
+        </button>
+        <button onclick="switchAshaSection('house-visits')" id="nav-house-visits" class="nav-tab px-3.5 py-2 rounded-xl text-xs whitespace-nowrap">
+          🏡 House Visits
+        </button>
+        <button onclick="switchAshaSection('reports')" id="nav-reports" class="nav-tab px-3.5 py-2 rounded-xl text-xs whitespace-nowrap">
+          📊 Reports
+        </button>
+        <button onclick="switchAshaSection('notifications')" id="nav-notifications" class="nav-tab px-3.5 py-2 rounded-xl text-xs whitespace-nowrap">
+          🔔 Notifications
+        </button>
+        <button onclick="switchAshaSection('profile')" id="nav-profile" class="nav-tab px-3.5 py-2 rounded-xl text-xs whitespace-nowrap">
+          👤 Profile
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- ========================================== -->
+    <!-- SECTION 1: DASHBOARD (8 Actionable Cards) -->
+    <!-- ========================================== -->
+    <div id="sec-dashboard" class="section-view active space-y-6">
+      
+      <!-- Territory Header Banner -->
+      <div class="p-6 bg-gradient-to-r from-teal-800 to-teal-900 rounded-3xl text-white shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-teal-300">Assigned Territory</span>
+          <h2 id="dash-village-title" class="text-2xl sm:text-3xl font-black mt-0.5">Rampur Village</h2>
+          <p id="dash-subcenter-subtitle" class="text-xs text-teal-200 mt-1">Sub-Center: Rampur • Primary Health Centre: Rampur PHC</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="switchAshaSection('priority-followups')" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-400 text-slate-900 hover:bg-amber-300 shadow-md">
+            ⚡ Action Priority List (<span id="btn-priority-count">0</span>)
+          </button>
+          <button onclick="openNewVisitModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white shadow-md">
+            + Schedule Visit
+          </button>
+        </div>
+      </div>
+
+      <!-- 8 Actionable Dashboard Cards Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3.5">
+        
+        <!-- Card 1: Total Families -->
+        <div onclick="switchAshaSection('families')" class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-teal-400 hover:shadow-md cursor-pointer transition-all">
+          <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+            <span class="font-bold uppercase text-[11px] text-slate-500">Total Families</span>
+            <span class="text-base">👨‍👩‍👧</span>
+          </div>
+          <span id="card-families" class="text-3xl font-black text-slate-900 block mt-1">0</span>
+          <p class="text-[11px] text-slate-500 mt-1">Registered households</p>
+        </div>
+
+        <!-- Card 2: Total Children -->
+        <div onclick="switchAshaSection('children')" class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-teal-400 hover:shadow-md cursor-pointer transition-all">
+          <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+            <span class="font-bold uppercase text-[11px] text-slate-500">Total Children</span>
+            <span class="text-base">👶</span>
+          </div>
+          <span id="card-children" class="text-3xl font-black text-slate-900 block mt-1">0</span>
+          <p class="text-[11px] text-slate-500 mt-1">In village jurisdiction</p>
+        </div>
+
+        <!-- Card 3: Vaccinations Completed -->
+        <div onclick="switchAshaSection('vaccinations')" class="p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200 shadow-sm hover:border-emerald-400 hover:shadow-md cursor-pointer transition-all">
+          <div class="flex items-center justify-between text-emerald-600 text-xs mb-1">
+            <span class="font-bold uppercase text-[11px] text-emerald-800">Completed Doses</span>
+            <span class="text-base">✅</span>
+          </div>
+          <span id="card-completed" class="text-3xl font-black text-emerald-700 block mt-1">0</span>
+          <p class="text-[11px] text-emerald-600 mt-1">Administered & logged</p>
+        </div>
+
+        <!-- Card 4: Vaccinations Due -->
+        <div onclick="switchAshaSection('priority-followups')" class="p-4 bg-amber-50/70 rounded-2xl border border-amber-200 shadow-sm hover:border-amber-400 hover:shadow-md cursor-pointer transition-all">
+          <div class="flex items-center justify-between text-amber-600 text-xs mb-1">
+            <span class="font-bold uppercase text-[11px] text-amber-800">Vaccinations Due</span>
+            <span class="text-base">🔔</span>
+          </div>
+          <span id="card-due" class="text-3xl font-black text-amber-700 block mt-1">0</span>
+          <p class="text-[11px] text-amber-600 mt-1">Due in current window</p>
+        </div>
+
+        <!-- Card 5: Vaccinations Overdue -->
+        <div onclick="switchAshaSection('priority-followups')" class="p-4 bg-rose-50/80 rounded-2xl border border-rose-200 shadow-sm hover:border-rose-400 hover:shadow-md cursor-pointer transition-all">
+          <div class="flex items-center justify-between text-rose-600 text-xs mb-1">
+            <span class="font-bold uppercase text-[11px] text-rose-800">Vaccinations Overdue</span>
+            <span class="text-base">⚠️</span>
+          </div>
+          <span id="card-overdue" class="text-3xl font-black text-rose-700 block mt-1 animate-pulse">0</span>
+          <p class="text-[11px] text-rose-600 mt-1">Missed vaccination window</p>
+        </div>
+
+        <!-- Card 6: Upcoming Vaccinations -->
+        <div onclick="switchAshaSection('vaccinations')" class="p-4 bg-sky-50/70 rounded-2xl border border-sky-200 shadow-sm hover:border-sky-400 hover:shadow-md cursor-pointer transition-all">
+          <div class="flex items-center justify-between text-sky-600 text-xs mb-1">
+            <span class="font-bold uppercase text-[11px] text-sky-800">Upcoming Doses</span>
+            <span class="text-base">⏳</span>
+          </div>
+          <span id="card-upcoming" class="text-3xl font-black text-sky-700 block mt-1">0</span>
+          <p class="text-[11px] text-sky-600 mt-1">Future scheduled doses</p>
+        </div>
+
+        <!-- Card 7: Pending Verification -->
+        <div onclick="switchAshaSection('children')" class="p-4 bg-indigo-50/70 rounded-2xl border border-indigo-200 shadow-sm hover:border-indigo-400 hover:shadow-md cursor-pointer transition-all">
+          <div class="flex items-center justify-between text-indigo-600 text-xs mb-1">
+            <span class="font-bold uppercase text-[11px] text-indigo-800">Pending Verification</span>
+            <span class="text-base">📋</span>
+          </div>
+          <span id="card-pending-verify" class="text-3xl font-black text-indigo-700 block mt-1">0</span>
+          <p class="text-[11px] text-indigo-600 mt-1">New self-registrations</p>
+        </div>
+
+        <!-- Card 8: Today's Follow-ups -->
+        <div onclick="switchAshaSection('house-visits')" class="p-4 bg-teal-50/70 rounded-2xl border border-teal-200 shadow-sm hover:border-teal-400 hover:shadow-md cursor-pointer transition-all">
+          <div class="flex items-center justify-between text-teal-600 text-xs mb-1">
+            <span class="font-bold uppercase text-[11px] text-teal-800">Today's Visits</span>
+            <span class="text-base">🏡</span>
+          </div>
+          <span id="card-todays-followups" class="text-3xl font-black text-teal-800 block mt-1">0</span>
+          <p class="text-[11px] text-teal-600 mt-1">Scheduled home visits</p>
+        </div>
+
+      </div>
+
+      <!-- Quick Action Priority Snapshot -->
+      <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+            <span>⚡</span>
+            <span>Immediate Action Items</span>
+          </h3>
+          <button onclick="switchAshaSection('priority-followups')" class="text-xs font-bold text-teal-700 hover:underline">
+            View All Priority Follow-ups →
+          </button>
+        </div>
+        <div id="dash-priority-preview" class="space-y-3">
+          <div class="text-center py-6 text-slate-400 text-xs">Loading priority actions...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2: PRIORITY FOLLOW-UPS -->
+    <!-- ========================================== -->
+    <div id="sec-priority-followups" class="section-view space-y-5">
+      
+      <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 flex items-center space-x-2">
+              <span>⚡</span>
+              <span>Priority Follow-ups & Action Matrix</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Automated triage: Overdue vaccinations, verification alerts, and approaching milestones</p>
+          </div>
+
+          <!-- Priority Filter Tabs -->
+          <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-2xl text-xs">
+            <button onclick="filterPriorityList('ALL')" id="pf-tab-all" class="px-3.5 py-1.5 rounded-xl font-bold bg-white text-slate-800 shadow-sm">All</button>
+            <button onclick="filterPriorityList('HIGH')" id="pf-tab-high" class="px-3.5 py-1.5 rounded-xl font-bold text-rose-700 hover:bg-white/50">🔴 HIGH</button>
+            <button onclick="filterPriorityList('MEDIUM')" id="pf-tab-medium" class="px-3.5 py-1.5 rounded-xl font-bold text-amber-700 hover:bg-white/50">🟡 MEDIUM</button>
+            <button onclick="filterPriorityList('LOW')" id="pf-tab-low" class="px-3.5 py-1.5 rounded-xl font-bold text-sky-700 hover:bg-white/50">🟢 LOW</button>
+          </div>
+        </div>
+
+        <!-- Priority Table -->
+        <div class="overflow-x-auto">
+          <table class="data-table w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
+                <th class="py-3 px-3.5">Priority</th>
+                <th class="py-3 px-3.5">Child</th>
+                <th class="py-3 px-3.5">Parent & Contact</th>
+                <th class="py-3 px-3.5">Village / House</th>
+                <th class="py-3 px-3.5">Reason</th>
+                <th class="py-3 px-3.5">Due Date</th>
+                <th class="py-3 px-3.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="priority-followup-tbody">
+              <tr><td colspan="7" class="py-8 text-center text-slate-400">Loading priority list...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 3: CHILDREN REGISTER -->
+    <!-- ========================================== -->
+    <div id="sec-children" class="section-view space-y-4">
+      
+      <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 flex items-center space-x-2">
+              <span>👶</span>
+              <span>Village Child Immunization Register</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Full child health registry for your assigned village jurisdiction</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="relative">
+              <input type="text" id="children-search-input" placeholder="Search child / MCP / parent..." oninput="debounceChildrenSearch()" class="pl-8 pr-4 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none w-56 sm:w-64">
+              <span class="absolute left-2.5 top-2.5 text-slate-400 text-xs">🔍</span>
+            </div>
+
+            <select id="children-status-filter" onchange="loadChildrenRoster()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 bg-white">
+              <option value="">All Statuses</option>
+              <option value="overdue">⚠️ Overdue Doses</option>
+              <option value="due">🔔 Due Now</option>
+              <option value="completed">✅ Completed</option>
+              <option value="alert">🚨 Alerts (SAM/MAM)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="data-table w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
+                <th class="py-3 px-3.5">Child & MCP ID</th>
+                <th class="py-3 px-3.5">Age / DOB</th>
+                <th class="py-3 px-3.5">Parent Details</th>
+                <th class="py-3 px-3.5">Immunization Progress</th>
+                <th class="py-3 px-3.5">Status</th>
+                <th class="py-3 px-3.5">Nutrition</th>
+                <th class="py-3 px-3.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="children-roster-tbody">
+              <tr><td colspan="7" class="py-8 text-center text-slate-400">Loading children...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 4: FAMILIES -->
+    <!-- ========================================== -->
+    <div id="sec-families" class="section-view space-y-4">
+      
+      <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 flex items-center space-x-2">
+              <span>👨‍👩‍👧</span>
+              <span>Village Family Registry</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Household registry and child family mapping in your assigned village</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="data-table w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
+                <th class="py-3 px-3.5">Family Head Name</th>
+                <th class="py-3 px-3.5">House # & Address</th>
+                <th class="py-3 px-3.5">Contact Number</th>
+                <th class="py-3 px-3.5">Category</th>
+                <th class="py-3 px-3.5">Children Count</th>
+                <th class="py-3 px-3.5 text-right">Registered On</th>
+              </tr>
+            </thead>
+            <tbody id="families-tbody">
+              <tr><td colspan="6" class="py-8 text-center text-slate-400">Loading families...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 5: VACCINATIONS -->
+    <!-- ========================================== -->
+    <div id="sec-vaccinations" class="section-view space-y-4">
+      
+      <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 flex items-center space-x-2">
+              <span>💉</span>
+              <span>Village Vaccination Overview</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">National UIP Schedule Breakdown and pending administration in your village</p>
+          </div>
+          <button onclick="switchAshaSection('priority-followups')" class="px-4 py-2 rounded-xl text-xs font-bold bg-teal-600 text-white hover:bg-teal-700">
+            Open Overdue List →
+          </button>
+        </div>
+
+        <div id="vaccine-category-summary-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="text-center py-6 text-slate-400 text-xs col-span-3">Loading vaccine schedule breakdown...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 6: HOUSE VISITS MANAGEMENT SYSTEM -->
+    <!-- ========================================== -->
+    <div id="sec-house-visits" class="section-view space-y-5">
+      
+      <!-- Smart Optimizer Banner -->
+      <div class="p-5 bg-gradient-to-r from-teal-800 to-teal-900 rounded-3xl text-white shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-teal-300">Intelligent Door-to-Door Optimization</span>
+          <h3 class="text-xl font-black mt-0.5">House Visit Management System</h3>
+          <p class="text-xs text-teal-200 mt-0.5">Identifies families that genuinely require visits • Eliminates unnecessary visits for up-to-date children</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="runSmartVisitPlanner()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-400 text-slate-900 hover:bg-amber-300 shadow-md flex items-center space-x-1.5">
+            <span>⚡</span>
+            <span>Auto-Plan Targeted Visits</span>
+          </button>
+          <button onclick="openNewVisitModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white shadow-md">
+            + Schedule Visit
+          </button>
+        </div>
+      </div>
+
+      <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+        
+        <!-- 4 Action Category Tabs with Live Badges -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-2xl text-xs overflow-x-auto scrollbar-hide">
+            <button onclick="switchVisitCategory('today')" id="vtab-today" class="px-3.5 py-2 rounded-xl font-bold bg-white text-slate-900 shadow-sm flex items-center space-x-1.5 whitespace-nowrap">
+              <span>📅 Today's Visits</span>
+              <span id="vcount-today" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-teal-600 text-white">0</span>
+            </button>
+            <button onclick="switchVisitCategory('upcoming')" id="vtab-upcoming" class="px-3.5 py-2 rounded-xl font-bold text-slate-600 hover:bg-white/50 flex items-center space-x-1.5 whitespace-nowrap">
+              <span>⏳ Upcoming Visits</span>
+              <span id="vcount-upcoming" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">0</span>
+            </button>
+            <button onclick="switchVisitCategory('pending')" id="vtab-pending" class="px-3.5 py-2 rounded-xl font-bold text-slate-600 hover:bg-white/50 flex items-center space-x-1.5 whitespace-nowrap">
+              <span>⚠️ Pending / Overdue</span>
+              <span id="vcount-pending" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">0</span>
+            </button>
+            <button onclick="switchVisitCategory('completed')" id="vtab-completed" class="px-3.5 py-2 rounded-xl font-bold text-slate-600 hover:bg-white/50 flex items-center space-x-1.5 whitespace-nowrap">
+              <span>✅ Completed Logs</span>
+              <span id="vcount-completed" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">0</span>
+            </button>
+          </div>
+
+          <!-- Priority Filter -->
+          <select id="visit-priority-filter" onchange="loadHouseVisits()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 bg-white">
+            <option value="">All Priorities</option>
+            <option value="HIGH">🔴 High Priority</option>
+            <option value="MEDIUM">🟡 Medium Priority</option>
+            <option value="LOW">🟢 Low Priority</option>
+          </select>
+        </div>
+
+        <!-- Visits Table -->
+        <div class="overflow-x-auto">
+          <table class="data-table w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
+                <th class="py-3 px-3.5">Priority</th>
+                <th class="py-3 px-3.5">Child & Family</th>
+                <th class="py-3 px-3.5">Scheduled Date</th>
+                <th class="py-3 px-3.5">Reason for Visit</th>
+                <th class="py-3 px-3.5">Status</th>
+                <th class="py-3 px-3.5">Observations / Notes</th>
+                <th class="py-3 px-3.5">Completed At</th>
+                <th class="py-3 px-3.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="house-visits-tbody">
+              <tr><td colspan="8" class="py-8 text-center text-slate-400">Loading house visits...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 7: REPORTS -->
+    <!-- ========================================== -->
+    <div id="sec-reports" class="section-view space-y-4">
+      
+      <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 flex items-center space-x-2">
+              <span>📊</span>
+              <span>Village Health & Immunization Monthly Report</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Official report for submission to Primary Health Centre (PHC) & MOIC</p>
+          </div>
+          <button onclick="window.print()" class="px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white hover:bg-teal-800 shadow-sm flex items-center space-x-1.5">
+            <span>🖨️</span>
+            <span>Print Report</span>
+          </button>
+        </div>
+
+        <div id="report-content" class="space-y-6">
+          <div class="text-center py-8 text-slate-400 text-xs">Loading report data...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 8: NOTIFICATIONS & FIELD ALERTS -->
+    <!-- ========================================== -->
+    <div id="sec-notifications" class="section-view space-y-4">
+      <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4 max-w-3xl">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 flex items-center space-x-2">
+              <span>🔔</span>
+              <span>Field Notifications & Alerts</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">New registrations, overdue vaccine warnings, verification requests & parent updates</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="markAllAshaNotificationsRead()" class="px-3 py-1.5 rounded-xl text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 hover:bg-teal-100">
+              ✓ Read All
+            </button>
+            <button onclick="refreshAshaNotificationAlerts()" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 flex items-center space-x-1">
+              <span>↻</span>
+              <span>Scan & Refresh Alerts</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="flex items-center space-x-2 border-b border-slate-100 pb-3 overflow-x-auto scrollbar-hide text-xs">
+          <button onclick="filterAshaNotifications('all')" id="asha-notif-pill-all" class="px-3.5 py-1.5 rounded-full font-bold bg-teal-600 text-white shadow-sm">
+            All Alerts
+          </button>
+          <button onclick="filterAshaNotifications('unread')" id="asha-notif-pill-unread" class="px-3.5 py-1.5 rounded-full font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">
+            Unread (<span id="asha-unread-badge">0</span>)
+          </button>
+          <button onclick="filterAshaNotifications('HIGH')" id="asha-notif-pill-high" class="px-3.5 py-1.5 rounded-full font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">
+            🔴 High Priority
+          </button>
+        </div>
+
+        <div id="asha-notifications-list" class="space-y-3">
+          <div class="text-center py-8 text-slate-400 text-xs">Loading notifications...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 9: PROFILE -->
+    <!-- ========================================== -->
+    <div id="sec-profile" class="section-view space-y-4">
+      <div class="max-w-xl p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-5">
+        <h2 class="text-xl font-black text-slate-900 flex items-center space-x-2">
+          <span>👤</span>
+          <span>ASHA Worker Profile</span>
+        </h2>
+
+        <div class="flex items-center space-x-4 p-4 bg-teal-50 rounded-2xl border border-teal-200">
+          <div class="w-14 h-14 rounded-2xl bg-teal-600 text-white font-black text-2xl flex items-center justify-center">
+            👩‍⚕️
+          </div>
+          <div>
+            <h3 id="prof-asha-name" class="text-base font-bold text-slate-900">Sunita Devi</h3>
+            <p id="prof-asha-code" class="text-xs text-teal-800 font-semibold font-mono">ASHA-2026-001</p>
+            <p id="prof-asha-village" class="text-xs text-slate-600 mt-0.5">Assigned Village: Rampur</p>
+          </div>
+        </div>
+
+        <div class="space-y-2.5 text-xs">
+          <div class="flex justify-between py-2 border-b border-slate-100">
+            <span class="text-slate-500">Phone Number</span>
+            <span id="prof-phone" class="font-bold text-slate-800">-</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-slate-100">
+            <span class="text-slate-500">Username</span>
+            <span id="prof-username" class="font-bold text-slate-800">-</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-slate-100">
+            <span class="text-slate-500">Qualification</span>
+            <span id="prof-qual" class="font-bold text-slate-800">Higher Secondary</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-slate-100">
+            <span class="text-slate-500">Role Authority</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800">Accredited Social Health Activist</span>
+          </div>
+        </div>
+
+        <div class="pt-4">
+          <button onclick="Auth.logout()" class="w-full py-3 rounded-xl font-bold text-xs text-rose-700 bg-rose-50 border border-rose-200 hover:bg-rose-100">
+            🚪 Log Out from Portal
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL: COMPREHENSIVE CHILD PROFILE (ASHA) -->
+  <!-- ========================================== -->
+  <div id="child-profile-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 relative">
+      
+      <!-- Modal Header -->
+      <div class="p-6 bg-gradient-to-r from-teal-800 to-teal-900 text-white rounded-t-3xl sticky top-0 z-10 flex items-start justify-between">
+        <div>
+          <div class="flex items-center space-x-2">
+            <h3 id="cp-modal-child-name" class="text-xl sm:text-2xl font-black">Child Name</h3>
+            <span id="cp-modal-verify-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900">
+              Pending Verification
+            </span>
+          </div>
+          <p id="cp-modal-meta" class="text-xs text-teal-200 mt-1">Age: - • MCP: - • Village: -</p>
+        </div>
+        <button onclick="closeChildProfileModal()" class="text-teal-300 hover:text-white font-bold text-2xl leading-none">✕</button>
+      </div>
+
+      <div class="p-6 space-y-6">
+        
+        <!-- Action Toolbar for ASHA -->
+        <div class="flex flex-wrap items-center gap-2 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+          <button id="cp-btn-verify" onclick="verifyCurrentChild()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center space-x-1.5">
+            <span>✓</span>
+            <span>Verify Information</span>
+          </button>
+          <button onclick="openAdministerModal(activeProfileChildId)" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-sm flex items-center space-x-1.5">
+            <span>💉</span>
+            <span>Record Vaccination</span>
+          </button>
+          <button onclick="openGrowthModal(activeProfileChildId, activeProfileChildName)" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 flex items-center space-x-1.5">
+            <span>📏</span>
+            <span>Record Growth</span>
+          </button>
+          <button onclick="openFollowUpModal(activeProfileChildId, activeProfileChildName)" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 flex items-center space-x-1.5">
+            <span>📝</span>
+            <span>Schedule House Visit</span>
+          </button>
+          <button onclick="openEditChildFieldsModal()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 flex items-center space-x-1.5">
+            <span>✏️</span>
+            <span>Update Permitted Fields</span>
+          </button>
+        </div>
+
+        <!-- Metric KPI Cards -->
+        <div class="grid grid-cols-4 gap-2 text-center text-xs">
+          <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200">
+            <span class="text-slate-500 font-semibold block text-[10px] uppercase">Total Doses</span>
+            <span id="cp-m-total" class="text-xl font-black text-slate-900 mt-0.5 block">0</span>
+          </div>
+          <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200">
+            <span class="text-emerald-700 font-semibold block text-[10px] uppercase">Completed</span>
+            <span id="cp-m-completed" class="text-xl font-black text-emerald-700 mt-0.5 block">0</span>
+          </div>
+          <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200">
+            <span class="text-amber-700 font-semibold block text-[10px] uppercase">Due Now</span>
+            <span id="cp-m-due" class="text-xl font-black text-amber-700 mt-0.5 block">0</span>
+          </div>
+          <div class="p-3 bg-rose-50 rounded-2xl border border-rose-200">
+            <span class="text-rose-700 font-semibold block text-[10px] uppercase">Overdue</span>
+            <span id="cp-m-overdue" class="text-xl font-black text-rose-700 mt-0.5 block">0</span>
+          </div>
+        </div>
+
+        <!-- 2 Columns: Child & Parent Details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-2xl bg-white border border-slate-200 space-y-2 text-xs">
+            <h4 class="font-bold text-slate-900 uppercase text-[11px] border-b border-slate-100 pb-1.5">👶 Child Information</h4>
+            <div class="flex justify-between"><span class="text-slate-500">DOB & Gender:</span><span id="cp-f-dob" class="font-semibold">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Birth Weight:</span><span id="cp-f-weight" class="font-semibold">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Blood Group:</span><span id="cp-f-blood" class="font-semibold">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Birth Place:</span><span id="cp-f-place" class="font-semibold">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Nutrition Status:</span><span id="cp-f-nutrition" class="font-semibold">-</span></div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white border border-slate-200 space-y-2 text-xs">
+            <h4 class="font-bold text-slate-900 uppercase text-[11px] border-b border-slate-100 pb-1.5">👨‍👩‍👧 Parent & Contact</h4>
+            <div class="flex justify-between"><span class="text-slate-500">Mother's Name:</span><span id="cp-f-mother" class="font-semibold">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Father's Name:</span><span id="cp-f-father" class="font-semibold">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Contact Number:</span><span id="cp-f-phone" class="font-semibold font-mono">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">House # & Ward:</span><span id="cp-f-house" class="font-semibold">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Village:</span><span id="cp-f-village" class="font-semibold">-</span></div>
+          </div>
+        </div>
+
+        <!-- Vaccination Timeline -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-slate-900 text-sm flex items-center space-x-1.5">
+              <span>💉</span>
+              <span>Universal Immunization Schedule Timeline</span>
+            </h4>
+            <span class="text-[10px] text-slate-500">Loaded from Master DB</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="data-table w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
+                  <th class="py-2.5 px-3">Vaccine</th>
+                  <th class="py-2.5 px-3">Category</th>
+                  <th class="py-2.5 px-3">Scheduled Date</th>
+                  <th class="py-2.5 px-3">Status</th>
+                  <th class="py-2.5 px-3">Administered Date</th>
+                  <th class="py-2.5 px-3">Batch & Site</th>
+                  <th class="py-2.5 px-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="cp-timeline-tbody">
+                <tr><td colspan="7" class="py-6 text-center text-slate-400">Loading timeline...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Previous House Visits History -->
+        <div class="space-y-3">
+          <h4 class="font-bold text-slate-900 text-sm flex items-center space-x-1.5">
+            <span>🏡</span>
+            <span>House Visit History & Counseling Notes</span>
+          </h4>
+          <div id="cp-visits-list" class="space-y-2 text-xs">
+            <div class="text-center py-4 text-slate-400">No house visits recorded yet.</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: Update Permitted Child Fields -->
+  <div id="edit-fields-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-slate-900">Update Permitted Child Details</h3>
+        <button onclick="closeEditFieldsModal()" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+      </div>
+
+      <form id="edit-permitted-fields-form" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">House Number / Ward</label>
+          <input type="text" id="ef-house" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Parent Contact Number</label>
+          <input type="tel" id="ef-phone" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Mother's Name</label>
+          <input type="text" id="ef-mother" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Father's Name</label>
+          <input type="text" id="ef-father" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Birth Weight (kg)</label>
+          <input type="number" step="0.1" id="ef-weight" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Field Notes</label>
+          <textarea id="ef-notes" rows="2" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500"></textarea>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl font-bold bg-teal-600 hover:bg-teal-700 text-white mt-2">
+          Save Permitted Updates
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Administer Vaccine Modal -->
+  <div id="administer-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeAdministerModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+      
+      <div class="mb-5">
+        <span class="text-xs font-bold uppercase tracking-wider text-teal-700">Official UIP Record</span>
+        <h3 class="text-2xl font-black text-slate-900 mt-0.5">Record Vaccine Given</h3>
+        <p class="text-xs text-slate-500 mt-1">Child: <strong id="administer-child-name" class="text-slate-800">Child Name</strong></p>
+      </div>
+
+      <form id="administer-vaccine-form" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Select Vaccine Dose *</label>
+          <select id="administer-vaccine-select" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs bg-white">
+            <option value="">-- Choose Pending Vaccine --</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold text-slate-700 uppercase mb-1">Date Administered *</label>
+            <input type="date" id="administer-date" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 uppercase mb-1">Vaccine Batch Number</label>
+            <input type="text" id="administer-batch" value="VAC-2026-B101" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs font-mono">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Session Site / Location</label>
+          <input type="text" id="administer-session-site" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs" placeholder="e.g. Anganwadi Center 1, Rampur">
+        </div>
+
+        <!-- AEFI Checkbox -->
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <label class="flex items-center space-x-2 font-bold text-slate-700 cursor-pointer">
+            <input type="checkbox" id="administer-aefi-toggle" class="w-4 h-4 rounded text-teal-600 focus:ring-teal-500">
+            <span>Report Adverse Event Following Immunization (AEFI)</span>
+          </label>
+          <input type="text" id="administer-aefi-notes" placeholder="Specify AEFI symptoms (e.g. high fever, mild rash)..." class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Field Remarks / Notes</label>
+          <input type="text" id="administer-notes" placeholder="e.g. Well tolerated, advised paracetamol drops if fever" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs">
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md">
+            Confirm & Log Vaccination
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Record Growth Modal -->
+  <div id="growth-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+      <button onclick="closeGrowthModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+      
+      <div class="mb-5">
+        <span class="text-xs font-bold uppercase tracking-wider text-teal-700">Growth Monitoring</span>
+        <h3 class="text-2xl font-black text-slate-900 mt-0.5">Record Child Growth</h3>
+        <p class="text-xs text-slate-500 mt-1">Child: <strong id="growth-child-name" class="text-slate-800">Child Name</strong></p>
+      </div>
+
+      <form id="record-growth-form" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Measurement Date *</label>
+          <input type="date" id="growth-date" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 uppercase mb-1">Weight (kg) *</label>
+            <input type="number" step="0.1" id="growth-weight" required placeholder="e.g. 6.2" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 uppercase mb-1">Height (cm)</label>
+            <input type="number" step="0.5" id="growth-height" placeholder="e.g. 65" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">MUAC (cm) - Mid-Upper Arm Circumference</label>
+          <input type="number" step="0.1" id="growth-muac" placeholder="e.g. 12.8 (Red < 11.5cm, Yellow 11.5-12.5cm)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Nutrition Remarks</label>
+          <input type="text" id="growth-notes" placeholder="e.g. Given Supplementary Nutrition THR" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs">
+        </div>
+
+        <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md">
+          Save Growth Measurement
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: House Visit / Follow-up Note Modal -->
+  <div id="followup-note-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+      <button onclick="closeFollowUpModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+      
+      <div class="mb-5">
+        <span class="text-xs font-bold uppercase tracking-wider text-teal-700">Home Visit Log</span>
+        <h3 class="text-2xl font-black text-slate-900 mt-0.5">Schedule Targeted House Visit</h3>
+        <p class="text-xs text-slate-500 mt-1">Child: <strong id="followup-child-name" class="text-slate-800">Child Name</strong></p>
+      </div>
+
+      <form id="followup-note-form" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Select Child *</label>
+          <select id="followup-child-select" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs bg-white">
+            <option value="">-- Choose Child --</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Visit Date *</label>
+          <input type="date" id="followup-date" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Visit Reason (Determines Priority) *</label>
+          <select id="followup-reason-select" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs bg-white">
+            <option value="Vaccination overdue">🔴 Vaccination overdue (High Priority)</option>
+            <option value="Information verification">🔴 Information verification (High Priority)</option>
+            <option value="Vaccination follow-up">🟡 Vaccination follow-up (Medium Priority)</option>
+            <option value="Child information incomplete">🟡 Child information incomplete (Medium Priority)</option>
+            <option value="Routine follow-up">🟢 Routine follow-up (Low Priority)</option>
+            <option value="Other authorized reason">Other authorized reason</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Visit Notes / Objective</label>
+          <textarea id="followup-remarks" rows="2" placeholder="e.g. Check on child vaccination and counsel family." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs"></textarea>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md">
+          Save Scheduled Visit
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Reschedule House Visit -->
+  <div id="reschedule-visit-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-slate-900">Reschedule House Visit</h3>
+        <button onclick="closeRescheduleVisitModal()" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+      </div>
+
+      <form id="reschedule-visit-form" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">New Scheduled Date *</label>
+          <input type="date" id="resched-new-date" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Reason for Rescheduling *</label>
+          <select id="resched-reason" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 bg-white">
+            <option value="Family unavailable / travelling">Family unavailable / travelling</option>
+            <option value="Aligned with upcoming Anganwadi session day">Aligned with upcoming Anganwadi session day</option>
+            <option value="Child was indisposed / recovering">Child was indisposed / recovering</option>
+            <option value="Field schedule conflict">Field schedule conflict</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl font-bold bg-teal-600 hover:bg-teal-700 text-white mt-2">
+          Confirm Rescheduling
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Mark House Visit Completed -->
+  <div id="complete-visit-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-slate-900">Log Completed House Visit</h3>
+        <button onclick="closeCompleteVisitModal()" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+      </div>
+
+      <form id="complete-visit-form" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Counseling Remarks / Notes *</label>
+          <textarea id="cv-remarks" required rows="3" placeholder="e.g. Visited household, counseled mother on importance of Pentavalent vaccine, confirmed attendance on Wednesday." class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs"></textarea>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Observations</label>
+          <input type="text" id="cv-observations" placeholder="e.g. Child appears healthy, normal appetite" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Action Taken</label>
+          <input type="text" id="cv-action" placeholder="e.g. Issued Anganwadi appointment slip" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Next Scheduled Follow-up (Optional)</label>
+          <input type="date" id="cv-next-date" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs">
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white mt-1">
+          ✓ Complete Visit & Log Timestamp
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] hidden max-w-sm w-full mx-4">
+    <div class="px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold text-white flex items-center space-x-2" id="toast-inner">
+      <span id="toast-msg"></span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/utils.js?v=20260908"></script>
+  <script src="/js/api.js?v=20260908"></script>
+  <script src="/js/auth.js?v=20260908"></script>
+  <script src="/js/asha.js?v=20260908"></script>
+</body>
+</html>

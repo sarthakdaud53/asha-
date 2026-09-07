@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Parent Portal – Digital ASHA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/custom.css">
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .nav-item { @apply flex flex-col items-center py-2 px-3 rounded-xl text-xs font-semibold transition-all; }
+    .nav-item.active { @apply bg-teal-600 text-white; }
+    .nav-item:not(.active) { @apply text-slate-500 hover:text-teal-700 hover:bg-teal-50; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .status-upcoming { @apply bg-sky-100 text-sky-800 border-sky-300; }
+    .status-due { @apply bg-amber-100 text-amber-800 border-amber-400; }
+    .status-overdue { @apply bg-rose-100 text-rose-800 border-rose-400; }
+    .status-administered { @apply bg-emerald-100 text-emerald-800 border-emerald-300; }
+    .status-not_applicable { @apply bg-slate-100 text-slate-500 border-slate-300; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .slide-up { animation: slideUp 0.3s ease-out; }
+    .step { display: none; }
+    .step.active { display: block; }
+    .step-indicator.done { @apply bg-teal-600 text-white; }
+    .step-indicator.active { @apply bg-teal-600 text-white ring-4 ring-teal-200; }
+    .step-indicator.pending { @apply bg-slate-200 text-slate-500; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+  <!-- Top App Bar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-sm">🏥</div>
+        <div>
+          <span class="font-bold text-sm text-slate-900">Digital ASHA</span>
+          <p class="text-[10px] text-slate-500 leading-none">Parent Portal</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button id="notif-btn" onclick="showSection('notifications')" class="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100">
+          🔔
+          <span id="notif-badge" class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+        <div id="header-avatar" class="w-8 h-8 rounded-lg bg-teal-100 text-teal-700 font-bold text-sm flex items-center justify-center cursor-pointer" onclick="showSection('profile')">P</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-5xl mx-auto w-full pb-28">
+
+    <!-- ========== DASHBOARD ========== -->
+    <section id="sec-dashboard" class="section active px-4 pt-5 space-y-5 slide-up">
+      
+      <!-- Welcome -->
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-xs text-slate-500 font-medium">Welcome back 👋</p>
+          <h1 id="dash-welcome-name" class="text-xl font-black text-slate-900 mt-0.5">Loading...</h1>
+          <p id="dash-village-name" class="text-xs text-teal-700 font-semibold mt-0.5"></p>
+        </div>
+        <button onclick="showSection('add-child')" class="px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-md shadow-teal-600/20 flex items-center space-x-1.5">
+          <span>+</span>
+          <span>Add Child</span>
+        </button>
+      </div>
+
+      <!-- Alert Banner -->
+      <div id="dash-alert-banner" class="hidden p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start space-x-3">
+        <span class="text-rose-500 text-lg mt-0.5">⚠️</span>
+        <div>
+          <p class="text-xs font-bold text-rose-900">Vaccination Alert</p>
+          <p id="dash-alert-text" class="text-xs text-rose-700 mt-0.5"></p>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+          <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Children</p>
+          <p id="kpi-children" class="text-3xl font-black text-slate-900 mt-1">–</p>
+          <p class="text-[10px] text-slate-400 mt-0.5">Registered</p>
+        </div>
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+          <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Completed</p>
+          <p id="kpi-completed" class="text-3xl font-black text-emerald-700 mt-1">–</p>
+          <p class="text-[10px] text-slate-400 mt-0.5">Vaccinations done</p>
+        </div>
+        <div class="bg-white rounded-2xl p-4 border border-amber-200 bg-amber-50 shadow-sm">
+          <p class="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Due Now</p>
+          <p id="kpi-due" class="text-3xl font-black text-amber-700 mt-1">–</p>
+          <p class="text-[10px] text-amber-600 mt-0.5">Need attention</p>
+        </div>
+        <div class="bg-white rounded-2xl p-4 border border-rose-200 bg-rose-50 shadow-sm">
+          <p class="text-[10px] font-bold text-rose-700 uppercase tracking-wider">Overdue</p>
+          <p id="kpi-overdue" class="text-3xl font-black text-rose-700 mt-1">–</p>
+          <p class="text-[10px] text-rose-600 mt-0.5">Missed doses</p>
+        </div>
+      </div>
+
+      <!-- Children Quick Cards -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-bold text-slate-900">My Children</h2>
+          <button onclick="showSection('children')" class="text-xs text-teal-700 font-semibold">View All →</button>
+        </div>
+        <div id="dash-children-list" class="space-y-3">
+          <div class="text-center py-8 text-slate-400 text-xs">Loading...</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========== MY FAMILY / CHILDREN ========== -->
+    <section id="sec-children" class="section px-4 pt-5 space-y-5 slide-up">
+      
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">My Children</h2>
+          <p id="children-count-label" class="text-xs text-slate-500 mt-0.5">Loading...</p>
+        </div>
+        <button onclick="showSection('add-child')" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-md">
+          + Add Child
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="relative">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+        <input id="children-search" type="text" placeholder="Search by child name..." oninput="filterChildCards()" class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+      </div>
+
+      <div id="children-grid" class="space-y-3">
+        <div class="text-center py-8 text-slate-400 text-xs">Loading children...</div>
+      </div>
+
+    </section>
+
+    <!-- ========== CHILD DETAIL / VACCINATION TIMELINE ========== -->
+    <section id="sec-child-detail" class="section slide-up">
+      
+      <!-- Child Profile Header -->
+      <div id="child-detail-header" class="bg-gradient-to-br from-teal-600 to-teal-700 text-white px-4 pt-5 pb-6">
+        <button onclick="showSection('children')" class="flex items-center text-teal-200 text-xs font-semibold mb-4 hover:text-white">
+          ← Back to Children
+        </button>
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 id="detail-name" class="text-xl font-black">Child Name</h2>
+            <p id="detail-age" class="text-teal-200 text-sm mt-0.5"></p>
+            <p id="detail-rch" class="text-teal-300 text-xs mt-1"></p>
+          </div>
+          <div id="detail-verification-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-teal-800/50 text-teal-100">
+            Pending
+          </div>
+        </div>
+
+        <!-- Metrics Row -->
+        <div class="grid grid-cols-4 gap-2 mt-5">
+          <div class="bg-white/10 rounded-xl p-2.5 text-center">
+            <p id="dm-total" class="text-lg font-black">–</p>
+            <p class="text-[9px] text-teal-200 font-semibold mt-0.5">Total</p>
+          </div>
+          <div class="bg-white/10 rounded-xl p-2.5 text-center">
+            <p id="dm-done" class="text-lg font-black text-emerald-300">–</p>
+            <p class="text-[9px] text-teal-200 font-semibold mt-0.5">Done</p>
+          </div>
+          <div class="bg-white/10 rounded-xl p-2.5 text-center">
+            <p id="dm-due" class="text-lg font-black text-amber-300">–</p>
+            <p class="text-[9px] text-teal-200 font-semibold mt-0.5">Due</p>
+          </div>
+          <div class="bg-white/10 rounded-xl p-2.5 text-center">
+            <p id="dm-overdue" class="text-lg font-black text-rose-300">–</p>
+            <p class="text-[9px] text-teal-200 font-semibold mt-0.5">Overdue</p>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mt-4">
+          <div class="flex justify-between text-[10px] text-teal-200 mb-1">
+            <span>Immunization Progress</span>
+            <span id="dm-rate">0%</span>
+          </div>
+          <div class="h-2 bg-white/20 rounded-full overflow-hidden">
+            <div id="dm-progress-bar" class="h-2 bg-emerald-400 rounded-full transition-all duration-700" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Navigation for Child Detail -->
+      <div class="flex border-b border-slate-200 bg-white sticky top-14 z-20 px-4">
+        <button id="tab-vaccines-btn" onclick="switchChildTab('vaccines')" class="flex-1 py-3 text-xs font-bold text-teal-700 border-b-2 border-teal-600">
+          💉 Vaccines
+        </button>
+        <button id="tab-growth-btn" onclick="switchChildTab('growth')" class="flex-1 py-3 text-xs font-bold text-slate-500 border-b-2 border-transparent">
+          📊 Growth
+        </button>
+        <button id="tab-info-btn" onclick="switchChildTab('info')" class="flex-1 py-3 text-xs font-bold text-slate-500 border-b-2 border-transparent">
+          👤 Info
+        </button>
+      </div>
+
+      <!-- Vaccine Timeline Tab -->
+      <div id="tab-vaccines" class="px-4 pt-4 pb-6 space-y-4">
+        
+        <!-- Status Filters (fetched from backend, not hardcoded) -->
+        <div class="flex space-x-2 overflow-x-auto pb-1 scrollbar-hide">
+          <button onclick="filterTimeline('all')" id="filter-all" class="filter-btn flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-teal-600 text-white">All</button>
+          <button onclick="filterTimeline('overdue')" id="filter-overdue" class="filter-btn flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white text-slate-600 border border-slate-300">⚠️ Overdue</button>
+          <button onclick="filterTimeline('due')" id="filter-due" class="filter-btn flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white text-slate-600 border border-slate-300">🔔 Due</button>
+          <button onclick="filterTimeline('upcoming')" id="filter-upcoming" class="filter-btn flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white text-slate-600 border border-slate-300">⏳ Upcoming</button>
+          <button onclick="filterTimeline('administered')" id="filter-administered" class="filter-btn flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white text-slate-600 border border-slate-300">✅ Completed</button>
+        </div>
+
+        <!-- Schedule Source Note -->
+        <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-200 flex items-center space-x-2 text-[10px] text-sky-700">
+          <span>🗄️</span>
+          <span>Schedule loaded from <strong>National UIP database</strong> — updated by Health Officer</span>
+        </div>
+
+        <!-- Timeline -->
+        <div id="vaccine-timeline" class="space-y-3">
+          <div class="text-center py-8 text-slate-400 text-xs">Loading vaccination timeline...</div>
+        </div>
+
+      </div>
+
+      <!-- Growth Tab -->
+      <div id="tab-growth" class="hidden px-4 pt-4 pb-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-slate-900">Growth Records</h3>
+        </div>
+        <div id="growth-records-list" class="space-y-3">
+          <div class="text-center py-8 text-slate-400 text-xs">No growth records yet.</div>
+        </div>
+      </div>
+
+      <!-- Child Info Tab -->
+      <div id="tab-info" class="hidden px-4 pt-4 pb-6 space-y-4">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-sm font-bold text-slate-900">Child Information</h3>
+          <button id="edit-info-btn" onclick="openEditChildModal()" class="px-3 py-1.5 text-xs font-bold text-teal-700 bg-teal-50 border border-teal-200 rounded-xl hover:bg-teal-100">
+            ✏️ Edit
+          </button>
+        </div>
+        <div id="child-info-fields" class="space-y-3"></div>
+      </div>
+
+    </section>
+
+    <!-- ========== ADD CHILD (Multi-Step Form) ========== -->
+    <section id="sec-add-child" class="section px-4 pt-5 pb-6 slide-up">
+      
+      <button onclick="cancelAddChild()" class="flex items-center text-slate-500 text-xs font-semibold mb-5 hover:text-teal-700">
+        ← Cancel
+      </button>
+
+      <div class="mb-6">
+        <h2 class="text-xl font-black text-slate-900">Register a Child</h2>
+        <p class="text-xs text-slate-500 mt-1">Simple 2-step form • Takes less than 2 minutes</p>
+      </div>
+
+      <!-- Step Indicators -->
+      <div class="flex items-center mb-8">
+        <div class="flex flex-col items-center">
+          <div id="si-1" class="step-indicator w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold active">1</div>
+          <p class="text-[10px] text-slate-500 mt-1">Family</p>
+        </div>
+        <div id="step-line" class="flex-1 h-0.5 bg-slate-200 mx-2 relative">
+          <div id="step-line-fill" class="h-full bg-teal-500 w-0 transition-all duration-500"></div>
+        </div>
+        <div class="flex flex-col items-center">
+          <div id="si-2" class="step-indicator w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold pending">2</div>
+          <p class="text-[10px] text-slate-500 mt-1">Child</p>
+        </div>
+      </div>
+
+      <form id="add-child-form" onsubmit="return false">
+
+        <!-- Step 1: Parent/Family Info -->
+        <div id="form-step-1" class="step active space-y-4">
+          <div class="p-4 bg-teal-50 rounded-2xl border border-teal-200 text-xs text-teal-800 flex items-start space-x-2">
+            <span class="mt-0.5">ℹ️</span>
+            <span>Your contact information is pre-filled from your account. Please confirm and add your home address.</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Your Name (Mother/Father/Guardian) *</label>
+            <input id="f-parent-name" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="e.g. Priya Kumari" required>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Mobile Number *</label>
+            <input id="f-phone" type="tel" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="10-digit mobile" required>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <select id="f-state" aria-label="State / UT" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm bg-white" required></select>
+            <select id="f-district" aria-label="District" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm bg-white" required disabled></select>
+            <select id="f-taluka" aria-label="Taluka / Sub-district" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm bg-white" required disabled></select>
+            <select id="f-village" aria-label="Village" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm bg-white" required disabled></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">House Number / Ward</label>
+            <input id="f-house" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="e.g. House 24, Ward 3">
+          </div>
+
+          <button type="button" onclick="goToStep2()" class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md mt-2">
+            Continue to Child Details →
+          </button>
+        </div>
+
+        <!-- Step 2: Child Info -->
+        <div id="form-step-2" class="step space-y-4">
+
+          <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-800 flex items-start space-x-2">
+            <span class="mt-0.5">💉</span>
+            <span>After registration, the full National UIP vaccination schedule will be automatically generated for this child based on the date of birth.</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Child's Full Name *</label>
+            <input id="f-child-name" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="e.g. Ravi Kumar" required>
+            <div id="err-child-name" class="text-xs text-rose-600 mt-1 hidden"></div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Date of Birth *</label>
+            <input id="f-dob" type="date" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" required>
+            <div id="err-dob" class="text-xs text-rose-600 mt-1 hidden"></div>
+            <p id="child-age-preview" class="text-xs text-teal-700 font-semibold mt-1 hidden"></p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Gender *</label>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="gender-opt cursor-pointer">
+                <input type="radio" name="gender" value="Male" class="hidden">
+                <div class="p-3 rounded-xl border-2 border-slate-200 text-center text-xs font-bold text-slate-600 hover:border-teal-400 transition-all gender-label">
+                  👦 Boy
+                </div>
+              </label>
+              <label class="gender-opt cursor-pointer">
+                <input type="radio" name="gender" value="Female" class="hidden">
+                <div class="p-3 rounded-xl border-2 border-slate-200 text-center text-xs font-bold text-slate-600 hover:border-teal-400 transition-all gender-label">
+                  👧 Girl
+                </div>
+              </label>
+              <label class="gender-opt cursor-pointer">
+                <input type="radio" name="gender" value="Other" class="hidden">
+                <div class="p-3 rounded-xl border-2 border-slate-200 text-center text-xs font-bold text-slate-600 hover:border-teal-400 transition-all gender-label">
+                  Other
+                </div>
+              </label>
+            </div>
+            <div id="err-gender" class="text-xs text-rose-600 mt-1 hidden"></div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Mother's Name</label>
+              <input id="f-mother" type="text" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Mother's name">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Father's Name</label>
+              <input id="f-father" type="text" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Father's name">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Birth Weight (kg)</label>
+            <input id="f-weight" type="number" step="0.1" min="0.5" max="9.9" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="e.g. 3.2">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Place of Birth</label>
+            <select id="f-birthplace" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+              <option value="PHC">Primary Health Centre (PHC)</option>
+              <option value="Government Hospital">Government Hospital</option>
+              <option value="Sub-Center">Health Sub-Center</option>
+              <option value="Home">Home Birth</option>
+              <option value="Private Hospital">Private Hospital</option>
+              <option value="Anganwadi">Anganwadi Center</option>
+            </select>
+          </div>
+
+          <div class="flex space-x-3 pt-2">
+            <button type="button" onclick="goToStep1()" class="flex-1 py-3.5 rounded-xl font-bold text-sm text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100">
+              ← Back
+            </button>
+            <button type="button" onclick="submitChildForm()" class="flex-1 py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md">
+              Register Child ✓
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- ========== NOTIFICATIONS CENTER ========== -->
+    <section id="sec-notifications" class="section px-4 pt-5 pb-6 slide-up space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-black text-slate-900">Notifications</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Vaccination reminders, verification alerts & ASHA visits</p>
+        </div>
+        <div class="flex items-center space-x-1.5">
+          <button onclick="markAllNotificationsRead()" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100" title="Mark all read">
+            ✓ Read All
+          </button>
+          <button onclick="refreshNotificationAlerts()" class="p-1.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200" title="Scan schedule & refresh">
+            ↻
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Pills -->
+      <div class="flex items-center space-x-2 border-b border-slate-100 pb-2 overflow-x-auto scrollbar-hide text-xs">
+        <button onclick="filterParentNotifications('all')" id="notif-pill-all" class="px-3 py-1.5 rounded-full font-bold bg-teal-600 text-white shadow-sm">
+          All
+        </button>
+        <button onclick="filterParentNotifications('unread')" id="notif-pill-unread" class="px-3 py-1.5 rounded-full font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">
+          Unread (<span id="parent-unread-badge">0</span>)
+        </button>
+        <button onclick="filterParentNotifications('HIGH')" id="notif-pill-high" class="px-3 py-1.5 rounded-full font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">
+          🔴 High Priority
+        </button>
+      </div>
+
+      <div id="notifications-list" class="space-y-3">
+        <div class="text-center py-8 text-slate-400 text-xs">Loading notifications...</div>
+      </div>
+    </section>
+
+    <!-- ========== PROFILE ========== -->
+    <section id="sec-profile" class="section px-4 pt-5 pb-6 slide-up">
+      <h2 class="text-lg font-bold text-slate-900 mb-5">My Profile</h2>
+
+      <div id="profile-card" class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4 mb-5">
+        <div class="flex items-center space-x-4">
+          <div id="profile-avatar" class="w-14 h-14 rounded-2xl bg-teal-100 text-teal-700 font-black text-2xl flex items-center justify-center">P</div>
+          <div>
+            <h3 id="profile-name" class="text-base font-bold text-slate-900">Loading...</h3>
+            <p id="profile-phone" class="text-xs text-slate-500"></p>
+            <p id="profile-role-badge" class="mt-1 inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800">Parent Account</p>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 space-y-2.5">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-500 text-xs">Username</span>
+            <span id="profile-username" class="font-semibold text-slate-900 text-xs">–</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-500 text-xs">Village</span>
+            <span id="profile-village" class="font-semibold text-slate-900 text-xs">–</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-500 text-xs">Account Status</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Active</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-3 mb-5">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+          <span>🔐</span><span>Change Password</span>
+        </h3>
+        <input id="cp-current" type="password" placeholder="Current password" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+        <input id="cp-new" type="password" placeholder="New password (min 6 chars)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+        <button onclick="handleChangePassword()" class="w-full py-2.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700">
+          Update Password
+        </button>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 mb-5">
+        <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center space-x-2">
+          <span>❓</span><span>Help & Support</span>
+        </h3>
+        <div class="space-y-2 text-xs text-slate-600">
+          <p>• Contact your assigned ASHA worker for help with vaccinations.</p>
+          <p>• Visit your nearest Sub-Center or PHC for any medical concerns.</p>
+          <p>• All data is securely stored and only visible to authorized health workers.</p>
+        </div>
+      </div>
+
+      <button onclick="Auth.logout()" class="w-full py-3.5 rounded-xl font-bold text-sm text-rose-700 bg-rose-50 border border-rose-200 hover:bg-rose-100">
+        🚪 Log Out
+      </button>
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 shadow-lg">
+    <div class="max-w-lg mx-auto px-2 py-2 grid grid-cols-5 gap-1">
+      <button onclick="showSection('dashboard')" id="nav-dashboard" class="nav-item active">
+        <span>🏠</span>
+        <span class="mt-0.5">Home</span>
+      </button>
+      <button onclick="showSection('children')" id="nav-children" class="nav-item">
+        <span>👶</span>
+        <span class="mt-0.5">Children</span>
+      </button>
+      <button onclick="showSection('add-child')" id="nav-add-child" class="nav-item">
+        <span class="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center text-white text-lg -mt-5 shadow-lg shadow-teal-600/40">+</span>
+        <span class="mt-0.5">Add</span>
+      </button>
+      <button onclick="showSection('notifications')" id="nav-notifications" class="nav-item">
+        <span>🔔</span>
+        <span class="mt-0.5">Alerts</span>
+      </button>
+      <button onclick="showSection('profile')" id="nav-profile" class="nav-item">
+        <span>👤</span>
+        <span class="mt-0.5">Profile</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Edit Child Modal -->
+  <div id="edit-child-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-end justify-center">
+    <div class="bg-white rounded-t-3xl w-full max-w-lg p-6 pb-8 space-y-4 max-h-[80vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-slate-900">Edit Child Information</h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+      </div>
+      <p class="text-xs text-amber-700 bg-amber-50 p-3 rounded-xl border border-amber-200">
+        ⚠️ Changing Date of Birth will recalculate all vaccination scheduled dates.
+      </p>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1.5">Child's Full Name</label>
+        <input id="edit-name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1.5">Date of Birth</label>
+        <input id="edit-dob" type="date" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Mother's Name</label>
+          <input id="edit-mother" type="text" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Father's Name</label>
+          <input id="edit-father" type="text" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1.5">Contact Number</label>
+        <input id="edit-contact" type="tel" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1.5">House Number</label>
+        <input id="edit-house" type="text" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+      </div>
+
+      <div class="flex space-x-3 pt-2">
+        <button onclick="closeEditModal()" class="flex-1 py-3 rounded-xl font-bold text-sm text-slate-700 bg-slate-100">Cancel</button>
+        <button onclick="submitEditChild()" class="flex-1 py-3 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vaccine Detail Modal -->
+  <div id="vaccine-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-end justify-center">
+    <div class="bg-white rounded-t-3xl w-full max-w-lg p-6 pb-8 max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="vmodal-name" class="text-base font-bold text-slate-900">Vaccine Details</h3>
+        <button onclick="closeVaccineModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+      </div>
+      <div id="vmodal-content" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] hidden max-w-sm w-full mx-4">
+    <div class="px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold text-white flex items-center space-x-2" id="toast-inner">
+      <span id="toast-msg"></span>
+    </div>
+  </div>
+
+  <script src="/js/utils.js?v=20260908"></script>
+  <script src="/js/api.js?v=20260908"></script>
+  <script src="/js/auth.js?v=20260908"></script>
+  <script src="/js/parent.js?v=20260908"></script>
+</body>
+</html>
